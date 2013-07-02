@@ -8,6 +8,8 @@
 package SkyscraperOptimization;
 
 import javax.swing.*;
+import java.awt.Frame;
+import java.awt.BorderLayout;
 import java.io.*;
 import peasy.*;
 import processing.opengl.*;
@@ -18,28 +20,32 @@ public class Main extends PApplet {
 
 	PeasyCam cam;
 	ControlP5 cp5;
-	//PMatrix3D currCameraMatrix;
-	//PGraphics3D g3;
+	PMatrix3D currCameraMatrix;
+	PGraphics3D p3;
 
 	int feet = 12;
 	int def;
+	Group g1, g2;
 
+	//ControlGroup is for inside the main applet
 	ControlGroup messageBox;
+	
+	ControlFrame cf;
 	int messageBoxResult = -1;
 	String messageBoxString = "";
 	float t;
 
 	public void setup() {
 
-		size(1200, 900, OPENGL);
-		//g3 = (PGraphics3D) g;
+		size(1200, 800, OPENGL);
+		p3 = (PGraphics3D) g;
 		cam = new PeasyCam(this, 300 * feet);
 		//cam.setMinimumDistance(2 * feet);
 		//cam.setMaximumDistance(2000 * feet);
 
 		cp5 = new ControlP5(this);
 
-		Group g1 = cp5.addGroup("g1")
+		g1 = cp5.addGroup("g1")
 				.setPosition(50, 50)
 				.setBackgroundHeight(100)
 				.setBackgroundColor(color(250,50)).bringToFront()
@@ -58,7 +64,7 @@ public class Main extends PApplet {
 		;
 
 
-		Group g2 = cp5.addGroup("g2")
+		g2 = cp5.addGroup("g2")
 				.setPosition(50,150)
 				.setWidth(300)
 				.activateEvent(true)
@@ -93,32 +99,45 @@ public class Main extends PApplet {
 		;
 		
 		cp5.setAutoDraw(false);
+		
+		//ControlFrame is for seperate windows
+		cf = addControlFrame("extra", 200, 200);
+		cf = addControlFrame("blank", 300, 200);
 
 	}
 
 
 	public void draw() {
 		
-		background(100);
+		background(def);
 		
 		//hint(ENABLE_DEPTH_TEST);
 		pushMatrix();
-		translate(width/2,height/2,mouseX);
+		translate(width/2,height/2,500);
 		rotateY(t+=0.1);
 		fill(255);
 		rect(-50,-50,100,100);
 		popMatrix();
 		//hint(DISABLE_DEPTH_TEST);
 		gui();
-		//camera();
+		
+		cam.setActive(true);
+		if(cp5.isMouseOver()){
+			cam.setActive(false);
+		}
 	}
 	
 	void gui() {
+		
 		hint(DISABLE_DEPTH_TEST);
 		cam.beginHUD();
+		currCameraMatrix  = new PMatrix3D(p3.camera);
+		camera();
 		cp5.draw();
+		p3.camera = currCameraMatrix;
 		cam.endHUD();
 		hint(ENABLE_DEPTH_TEST);
+		
 	}
 
 	public void controlEvent(ControlEvent theEvent) {
@@ -126,6 +145,7 @@ public class Main extends PApplet {
 			println("got an event from group "
 					+theEvent.getGroup().getName()
 					+", isOpen? "+theEvent.getGroup().isOpen()
+					+"     " + theEvent.getGroup().isMouseOver()
 					);
 
 		} else if (theEvent.isController()){
@@ -143,5 +163,18 @@ public class Main extends PApplet {
 			}
 		}
 	}
+	
+	ControlFrame addControlFrame(String theName, int theWidth, int theHeight) {
+		  Frame f = new Frame(theName);
+		  ControlFrame p = new ControlFrame(this, theWidth, theHeight);
+		  f.add(p);
+		  p.init();
+		  f.setTitle(theName);
+		  f.setSize(p.w, p.h);
+		  f.setLocation(100, 100);
+		  f.setResizable(false);
+		  f.setVisible(true);
+		  return p;
+		}
 	
 }

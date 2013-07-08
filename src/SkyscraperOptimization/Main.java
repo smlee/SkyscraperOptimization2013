@@ -34,6 +34,11 @@ public class Main extends PApplet {
 	int messageBoxResult = -1;
 	String messageBoxString = "";
 	float t;
+	
+	
+	//Skyscraper Parts
+	int numLevels = 0;
+	LevelStack myLevels = new LevelStack(numLevels, this);
 
 	public void setup() {
 
@@ -46,17 +51,13 @@ public class Main extends PApplet {
 		cp5 = new ControlP5(this);
 
 		g1 = cp5.addGroup("g1")
-				.setPosition(50, 50)
+				.setPosition(0, 11)
 				.setBackgroundHeight(100)
-				.setBackgroundColor(color(250,50)).bringToFront()
+				.setBackgroundColor(color(50,100))//.bringToFront()
 				;
-
-		cp5.addBang("A-1")
-		.setPosition(10, 20)
-		.setSize(80, 20)
-		.setGroup(g1)
-		;
-
+		cp5.addTextfield("numLevels").setCaptionLabel("Number of Levels").setPosition(10,10).setSize(70, 15).setGroup(g1);
+		cp5.addButton("addLevel").setCaptionLabel("Add Level").setPosition(10, 40).setSize(70, 15).setGroup(g1);
+		
 		cp5.addBang("A-2")
 		.setPosition(10, 60)
 		.setSize(80, 20)
@@ -65,7 +66,7 @@ public class Main extends PApplet {
 
 
 		g2 = cp5.addGroup("g2")
-				.setPosition(50,150)
+				.setPosition(0,121)
 				.setWidth(300)
 				.activateEvent(true)
 				.setBackgroundColor(color(50,100))
@@ -101,8 +102,9 @@ public class Main extends PApplet {
 		cp5.setAutoDraw(false);
 		
 		//ControlFrame is for seperate windows
-		cf = addControlFrame("extra", 200, 200);
-		cf = addControlFrame("blank", 300, 200);
+		/*cf = addControlFrame("extra", 200, 200);
+		*cf = addControlFrame("blank", 300, 200);
+		**/
 
 	}
 
@@ -113,6 +115,7 @@ public class Main extends PApplet {
 		
 		//hint(ENABLE_DEPTH_TEST);
 		pushMatrix();
+		myLevels.drawStack();
 		translate(width/2,height/2,500);
 		rotateY(t+=0.1);
 		fill(255);
@@ -127,6 +130,7 @@ public class Main extends PApplet {
 		}
 	}
 	
+	//This setup is to disable PeasyCam when ControlP5 is being used. 
 	void gui() {
 		
 		hint(DISABLE_DEPTH_TEST);
@@ -139,7 +143,20 @@ public class Main extends PApplet {
 		hint(ENABLE_DEPTH_TEST);
 		
 	}
-
+	
+	//intialize and sync Skyscraper data and ControlP5
+	public void initialize(){
+		
+	}
+	
+	//ControlP5 control events section
+	
+	//control events for textfields
+	public void numLevels(String theText){
+		
+	}
+	
+	//general control events
 	public void controlEvent(ControlEvent theEvent) {
 		if(theEvent.isGroup()) {
 			println("got an event from group "
@@ -152,6 +169,10 @@ public class Main extends PApplet {
 			println("got something from a controller "
 					+theEvent.getController().getName()
 					);
+		} else if (theEvent.isFrom("Set")){
+			noLoop();
+			//theEvent.getController().get
+			
 		}
 	}
 
@@ -163,7 +184,7 @@ public class Main extends PApplet {
 			}
 		}
 	}
-	
+	/*For external window
 	ControlFrame addControlFrame(String theName, int theWidth, int theHeight) {
 		  Frame f = new Frame(theName);
 		  ControlFrame p = new ControlFrame(this, theWidth, theHeight);
@@ -175,6 +196,7 @@ public class Main extends PApplet {
 		  f.setResizable(false);
 		  f.setVisible(true);
 		  return p;
-		}
+	}
+	*/
 	
 }

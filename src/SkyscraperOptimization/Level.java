@@ -9,11 +9,19 @@ public class Level {
 	
 	int feet = 12;
 	
-	int levelWidth, textMargin;
+	int levelWidth; 
+	int textMargin = 2*feet;
 	int levelTextSize = 40;
 	
-	 Level ( int e, PApplet p){
+	Level (int e, PApplet p) {
+		this.elevation = e;
+		this.levelWidth = 20 * feet;
+		parent = p;
+	}
+	
+	 Level (int e, int w, PApplet p){
 	      this.elevation = e;
+	      this.levelWidth = w;
 	      parent = p;
 	 }
 	 

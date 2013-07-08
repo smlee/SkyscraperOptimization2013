@@ -19,17 +19,15 @@ import controlP5.*;
 public class Main extends PApplet {
 
 	PeasyCam cam;
-	ControlP5 cp5;
 	PMatrix3D currCameraMatrix;
 	PGraphics3D p3;
-
-	int feet = 12;
-	int def;
+	
+	//ControlP5 stuff
+	ControlP5 cp5;
 	Group g1, g2;
 
 	//ControlGroup is for inside the main applet
 	ControlGroup messageBox;
-	
 	ControlFrame cf;
 	int messageBoxResult = -1;
 	String messageBoxString = "";
@@ -37,8 +35,14 @@ public class Main extends PApplet {
 	
 	
 	//Skyscraper Parts
-	int numLevels = 0;
-	LevelStack myLevels = new LevelStack(numLevels, this);
+	int feet = 12;
+	int def;
+	int numLevels = 10;
+	LevelStack myLevels;
+	
+	//Skyscraper data
+	String lW;
+	int lw, nl;
 
 	public void setup() {
 
@@ -49,21 +53,82 @@ public class Main extends PApplet {
 		//cam.setMaximumDistance(2000 * feet);
 
 		cp5 = new ControlP5(this);
+		inCP5();
+		initialize();
+		
+		myLevels = new LevelStack(numLevels, lw, this); // initialize with 0 Levels
 
+	}
+
+
+	public void draw() {
+		
+		background(250);
+		
+		//hint(ENABLE_DEPTH_TEST);
+		pushMatrix();
+		myLevels.drawStack();
+		
+		popMatrix();
+		//hint(DISABLE_DEPTH_TEST);
+		gui();
+		
+		cam.setActive(true);
+		if(cp5.isMouseOver()){
+			cam.setActive(false);
+		}
+	}
+	
+	//This setup is to disable PeasyCam when ControlP5 is being used. 
+	void gui() {
+		
+		hint(DISABLE_DEPTH_TEST);
+		cam.beginHUD();
+		currCameraMatrix  = new PMatrix3D(p3.camera);
+		camera();
+		cp5.draw();
+		p3.camera = currCameraMatrix;
+		cam.endHUD();
+		hint(ENABLE_DEPTH_TEST);
+		
+	}
+	
+	//intialize and sync Skyscraper data and ControlP5
+	public void initialize(){
+		lW = cp5.get(Textfield.class, "lvlWidth").getText();
+		lw = Integer.parseInt(lW)*feet;
+		
+	}
+	
+	//ControlP5 control events section
+	
+	//control events for textfields
+	public void numLevels(String theText){
+		myLevels.flush();
+		nl = Integer.parseInt(theText);
+		myLevels = new LevelStack(nl, lw, this);
+	}
+	
+	public void lvlWidth(String theText){
+		
+	}
+	
+	/*
+	 * 
+	 * ControlP5 section
+	 * 
+	 */
+	
+	public void inCP5(){
 		g1 = cp5.addGroup("g1")
 				.setPosition(0, 11)
 				.setBackgroundHeight(100)
 				.setBackgroundColor(color(50,100))//.bringToFront()
+				.setLabel("Levels")
 				;
 		cp5.addTextfield("numLevels").setCaptionLabel("Number of Levels").setPosition(10,10).setSize(70, 15).setGroup(g1);
+		cp5.addTextfield("lvlWidth").setCaptionLabel("Level Width").setPosition(10, 40).setSize(70, 15).setValue("40").setGroup(g1);
 		cp5.addButton("addLevel").setCaptionLabel("Add Level").setPosition(10, 40).setSize(70, 15).setGroup(g1);
-		
-		cp5.addBang("A-2")
-		.setPosition(10, 60)
-		.setSize(80, 20)
-		.setGroup(g1)
-		;
-
 
 		g2 = cp5.addGroup("g2")
 				.setPosition(0,121)
@@ -105,58 +170,9 @@ public class Main extends PApplet {
 		/*cf = addControlFrame("extra", 200, 200);
 		*cf = addControlFrame("blank", 300, 200);
 		**/
-
-	}
-
-
-	public void draw() {
-		
-		background(def);
-		
-		//hint(ENABLE_DEPTH_TEST);
-		pushMatrix();
-		myLevels.drawStack();
-		translate(width/2,height/2,500);
-		rotateY(t+=0.1);
-		fill(255);
-		rect(-50,-50,100,100);
-		popMatrix();
-		//hint(DISABLE_DEPTH_TEST);
-		gui();
-		
-		cam.setActive(true);
-		if(cp5.isMouseOver()){
-			cam.setActive(false);
-		}
 	}
 	
-	//This setup is to disable PeasyCam when ControlP5 is being used. 
-	void gui() {
-		
-		hint(DISABLE_DEPTH_TEST);
-		cam.beginHUD();
-		currCameraMatrix  = new PMatrix3D(p3.camera);
-		camera();
-		cp5.draw();
-		p3.camera = currCameraMatrix;
-		cam.endHUD();
-		hint(ENABLE_DEPTH_TEST);
-		
-	}
-	
-	//intialize and sync Skyscraper data and ControlP5
-	public void initialize(){
-		
-	}
-	
-	//ControlP5 control events section
-	
-	//control events for textfields
-	public void numLevels(String theText){
-		
-	}
-	
-	//general control events
+	//General control events
 	public void controlEvent(ControlEvent theEvent) {
 		if(theEvent.isGroup()) {
 			println("got an event from group "

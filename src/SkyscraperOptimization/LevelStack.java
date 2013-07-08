@@ -11,12 +11,12 @@ public class LevelStack {
     int feet = 12;
     int typicalLevelHeight = (14*feet)+4; // 14feet 4inches
     
-    public LevelStack ( int numLevels, PApplet p ){
+    public LevelStack (int numLevels, int levelWidth, PApplet p ){
     	parent = p;
     	myLevels = new ArrayList();
 
     	for (int i=0; i<numLevels; i++){
-    		myLevels.add( new Level(i*typicalLevelHeight, parent) );
+    		myLevels.add(new Level(i*typicalLevelHeight, levelWidth, parent) );
     	}
 
     }
@@ -36,6 +36,10 @@ public class LevelStack {
     
     public void removeLevel(int i){
     	myLevels.remove(i);
+    }
+    
+    public void flush(){
+    	myLevels.clear();
     }
     
     public void setHeight(int h, int i){

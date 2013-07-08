@@ -47,5 +47,12 @@ public class LevelStack {
     	lev.elevation = h;
     }
     
+    public void setWidthAll(int w){
+    	for (int i = 0; i < myLevels.size(); i++) {
+    		lev = (Level) myLevels.get(i);
+    		lev.levelWidth = w;
+    	}
+    }
+    
 }
 

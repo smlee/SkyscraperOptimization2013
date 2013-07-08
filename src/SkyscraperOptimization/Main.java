@@ -39,6 +39,7 @@ public class Main extends PApplet {
 	int def;
 	int numLevels = 10;
 	LevelStack myLevels;
+	Level lev;
 	
 	//Skyscraper data
 	String lW;
@@ -110,7 +111,12 @@ public class Main extends PApplet {
 	}
 	
 	public void lvlWidth(String theText){
-		
+		lW = theText;
+		lw = Integer.parseInt(lW)*feet;
+		for (int i = 0; i < myLevels.myLevels.size(); i++){
+			lev = (Level)myLevels.myLevels.get(i);
+			lev.levelWidth = lw;
+		}
 	}
 	
 	/*
@@ -126,9 +132,10 @@ public class Main extends PApplet {
 				.setBackgroundColor(color(50,100))//.bringToFront()
 				.setLabel("Levels")
 				;
+		
 		cp5.addTextfield("numLevels").setCaptionLabel("Number of Levels").setPosition(10,10).setSize(70, 15).setGroup(g1);
 		cp5.addTextfield("lvlWidth").setCaptionLabel("Level Width").setPosition(10, 40).setSize(70, 15).setValue("40").setGroup(g1);
-		cp5.addButton("addLevel").setCaptionLabel("Add Level").setPosition(10, 40).setSize(70, 15).setGroup(g1);
+		cp5.addButton("addLevel").setCaptionLabel("Add Level").setPosition(10, 70).setSize(70, 15).setGroup(g1);
 
 		g2 = cp5.addGroup("g2")
 				.setPosition(0,121)

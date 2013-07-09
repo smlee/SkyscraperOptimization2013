@@ -7,10 +7,6 @@
 
 package SkyscraperOptimization;
 
-import javax.swing.*;
-import java.awt.Frame;
-import java.awt.BorderLayout;
-import java.io.*;
 import peasy.*;
 import processing.opengl.*;
 import processing.core.*;
@@ -23,8 +19,8 @@ public class Main extends PApplet {
 	PGraphics3D p3;
 	
 	//ControlP5 stuff
-	ControlP5 cp5;
-	Group g1, g2;
+	//ControlP5 cp5;
+	cp5GUI cp5;
 
 	//ControlGroup is for inside the main applet
 	ControlGroup messageBox;
@@ -37,13 +33,9 @@ public class Main extends PApplet {
 	//Skyscraper Parts
 	int feet = 12;
 	int def;
-	int numLevels = 10;
 	LevelStack myLevels;
 	Level lev;
-	
-	//Skyscraper data
-	String lW;
-	int lw, nl;
+	Skyscraper mySkyscraper;
 
 	public void setup() {
 
@@ -53,11 +45,13 @@ public class Main extends PApplet {
 		//cam.setMinimumDistance(2 * feet);
 		//cam.setMaximumDistance(2000 * feet);
 
-		cp5 = new ControlP5(this);
-		inCP5();
-		initialize();
+		cp5 = new cp5GUI(this);
+		cp5.inCP5();
+		cp5.initialize();
 		
-		myLevels = new LevelStack(numLevels, lw, this); // initialize with 0 Levels
+		System.out.println(cp5.lw + "   " + cp5.nl);
+		
+		mySkyscraper = new Skyscraper(cp5.nl, cp5.lw, this);
 
 	}
 
@@ -68,14 +62,14 @@ public class Main extends PApplet {
 		
 		//hint(ENABLE_DEPTH_TEST);
 		pushMatrix();
-		myLevels.drawStack();
+		mySkyscraper.myLevels.drawStack();
 		
 		popMatrix();
 		//hint(DISABLE_DEPTH_TEST);
 		gui();
 		
 		cam.setActive(true);
-		if(cp5.isMouseOver()){
+		if(cp5.cp5.isMouseOver()){
 			cam.setActive(false);
 		}
 	}
@@ -87,126 +81,29 @@ public class Main extends PApplet {
 		cam.beginHUD();
 		currCameraMatrix  = new PMatrix3D(p3.camera);
 		camera();
-		cp5.draw();
+		cp5.cp5.draw();
 		p3.camera = currCameraMatrix;
 		cam.endHUD();
 		hint(ENABLE_DEPTH_TEST);
 		
 	}
 	
-	//intialize and sync Skyscraper data and ControlP5
-	public void initialize(){
-		lW = cp5.get(Textfield.class, "lvlWidth").getText();
-		lw = Integer.parseInt(lW)*feet;
-		
-	}
-	
-	//ControlP5 control events section
-	
-	//control events for textfields
 	public void numLevels(String theText){
-		myLevels.flush();
-		nl = Integer.parseInt(theText);
-		myLevels = new LevelStack(nl, lw, this);
+		mySkyscraper.myLevels.flush();
+		cp5.nl = Integer.parseInt(theText);
+		mySkyscraper.myLevels = new LevelStack(cp5.nl, cp5.lw, this);
 	}
 	
 	public void lvlWidth(String theText){
-		lW = theText;
-		lw = Integer.parseInt(lW)*feet;
-		for (int i = 0; i < myLevels.myLevels.size(); i++){
-			lev = (Level)myLevels.myLevels.get(i);
-			lev.levelWidth = lw;
+		cp5.lW = theText;
+		cp5.lw = Integer.parseInt(cp5.lW)*feet;
+		for (int i = 0; i < mySkyscraper.myLevels.myLevels.size(); i++){
+			lev = (Level)mySkyscraper.myLevels.myLevels.get(i);
+			lev.levelWidth = cp5.lw;
 		}
 	}
 	
-	/*
-	 * 
-	 * ControlP5 section
-	 * 
-	 */
 	
-	public void inCP5(){
-		g1 = cp5.addGroup("g1")
-				.setPosition(0, 11)
-				.setBackgroundHeight(100)
-				.setBackgroundColor(color(50,100))//.bringToFront()
-				.setLabel("Levels")
-				;
-		
-		cp5.addTextfield("numLevels").setCaptionLabel("Number of Levels").setPosition(10,10).setSize(70, 15).setGroup(g1);
-		cp5.addTextfield("lvlWidth").setCaptionLabel("Level Width").setPosition(10, 40).setSize(70, 15).setValue("40").setGroup(g1);
-		cp5.addButton("addLevel").setCaptionLabel("Add Level").setPosition(10, 70).setSize(70, 15).setGroup(g1);
-
-		g2 = cp5.addGroup("g2")
-				.setPosition(0,121)
-				.setWidth(300)
-				.activateEvent(true)
-				.setBackgroundColor(color(50,100))
-				.setBackgroundHeight(100)
-				.setLabel("Hello World.")
-				.bringToFront()
-				.setMoveable(true)
-				;
-
-		cp5.addSlider("S-1")
-		.setPosition(80,10)
-		.setSize(180,9)
-		.setGroup(g2)
-		;
-
-		cp5.addSlider("S-2")
-		.setPosition(80,20)
-		.setSize(180,9)
-		.setGroup(g2)
-		;
-
-		cp5.addRadioButton("radio")
-		.setPosition(10,10)
-		.setSize(20,9)
-		.addItem("black",0)
-		.addItem("red",1)
-		.addItem("green",2)
-		.addItem("blue",3)
-		.addItem("grey",4)
-		.setGroup(g2)
-		;
-		
-		cp5.setAutoDraw(false);
-		
-		//ControlFrame is for seperate windows
-		/*cf = addControlFrame("extra", 200, 200);
-		*cf = addControlFrame("blank", 300, 200);
-		**/
-	}
-	
-	//General control events
-	public void controlEvent(ControlEvent theEvent) {
-		if(theEvent.isGroup()) {
-			println("got an event from group "
-					+theEvent.getGroup().getName()
-					+", isOpen? "+theEvent.getGroup().isOpen()
-					+"     " + theEvent.getGroup().isMouseOver()
-					);
-
-		} else if (theEvent.isController()){
-			println("got something from a controller "
-					+theEvent.getController().getName()
-					);
-		} else if (theEvent.isFrom("Set")){
-			noLoop();
-			//theEvent.getController().get
-			
-		}
-	}
-
-
-	public void keyPressed() {
-		if(key==' ') {
-			if(cp5.getGroup("g1")!=null) {
-				cp5.getGroup("g1").remove();
-			}
-		}
-	}
 	/*For external window
 	ControlFrame addControlFrame(String theName, int theWidth, int theHeight) {
 		  Frame f = new Frame(theName);

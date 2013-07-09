@@ -1,19 +1,19 @@
 package SkyscraperOptimization;
 
-import SkyscraperOptimization.Level;
+//import SkyscraperOptimization.Level;
 import processing.core.PApplet;
 import java.util.*;
 
 public class LevelStack {
 	PApplet parent; // The parent PApplet that we will render ourselves onto
-    ArrayList myLevels;
+    ArrayList<Level> myLevels;
     Level lev;
     int feet = 12;
     int typicalLevelHeight = (14*feet)+4; // 14feet 4inches
     
     public LevelStack (int numLevels, int levelWidth, PApplet p ){
     	parent = p;
-    	myLevels = new ArrayList();
+    	myLevels = new ArrayList<Level>();
 
     	for (int i=0; i<numLevels; i++){
     		myLevels.add(new Level(i*typicalLevelHeight, levelWidth, parent) );
@@ -24,7 +24,6 @@ public class LevelStack {
     public void drawStack(){
     	for (int i=0; i<myLevels.size(); i++){
     		lev = (Level) myLevels.get(i);
-    		parent.println("Got Level " + i + " out of the arrayList... here comes draw()...");
     		lev.drawLevel(i);
     	}
     }
